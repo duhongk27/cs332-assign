@@ -45,6 +45,7 @@ object Main {
       else if (coins.isEmpty) 0
       else use_coin(money - coins.head, coins) + use_coin(money, coins.tail)
     }
-    use_coin(money, coins)
+    if (money > 0 && !(coins.isEmpty)) use_coin(money, coins)
+    else 0
   }
 }
