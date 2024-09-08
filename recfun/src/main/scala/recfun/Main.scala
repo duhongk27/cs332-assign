@@ -23,7 +23,7 @@ object Main {
    * Exercise 2
    */
   def balance(chars: List[Char]): Boolean = {
-    def check(chars: List[char], cnt: Int = 0): Boolean = {
+    def check(chars: List[Char], cnt: Int = 0): Boolean = {
       if(chars.isEmpty) cnt == 0
       else {
         if (chars.head == '(') check(chars.tail, cnt + 1)
@@ -43,7 +43,12 @@ object Main {
     def use_coin(money: Int, coins: List[Int]): Int = {
       if(money == 0) 1
       else if (coins.isEmpty) 0
-      else use_coin(money - coins.head, coins) + use_coin(money, coins.tail)
+      else if (money < 0) 0
+      else {
+        val select_this_coin = use_coin(money - coins.head, coins)
+        val not_select_this_coin = use_coin(money, coins.tail)
+        select_this_coin + not_select_this_coin
+      }
     }
     if (money > 0 && !(coins.isEmpty)) use_coin(money, coins)
     else 0
