@@ -57,8 +57,8 @@ object FunSets {
    */
   def forall(s: Set, p: Int => Boolean): Boolean = {
     def iter(a: Int): Boolean = {
-      if (a <= bound) true
-      else if (s.contains(a)&&!p(a)) false
+      if (a > bound) true
+      else if (s(a)&& (!p(a))) false
       else iter(a+1)
     }
     iter(-bound)
@@ -75,11 +75,10 @@ object FunSets {
    * a has the property ‐1000 <= a <= 1000
    */
   def map(s: Set, f: Int => Int): Set = {
-    def iter(a: Int): Boolean = {
-      if (a <= bound) Set()
-      else if (s.contains(a)) {
-        union(iter(a+1)), singletonSet(f(a))
-      }
+    def iter(a: Int): Set = {
+      if (a > bound) Set()
+      else if (s(a))
+        union(iter(a+1), singletonSet(f(a)))
       else iter(a+1)
     }
     iter(-bound)
