@@ -128,47 +128,44 @@ class Empty extends TweetSet {
 
   def foreach(f: Tweet => Unit): Unit = ()
 
-  def descendingByRetweet: TweetList = new Nil
+  def descendingByRetweet: TweetList = Nil
 }
 
-class NonEmpty(currentTweet: Tweet, leftElem: TweetSet, rightElem: TweetSet) extends TweetSet {
+class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(satisfiesCondition: Tweet => Boolean, accumulatedTweet: TweetSet): TweetSet = {
-    val newAccumulateTweet = 
-      if(satisfiesCondition(currentTweet)) accumulatedTweet.incl(currentTweet)
+    val newAccumulateTweet = {
+      if(satisfiesCondition(elem)) accumulatedTweet.incl(elem)
       else accumulatedTweet
-    val leftFiltered = leftElem.filterAcc(satisfiesCondition, newAccumulatedTweet)
-    val leftAndRightFiltered = rightElem.filterAcc(satisfiesCondition, newleftFiltered)
+    }
+    val leftFiltered = left.filterAcc(satisfiesCondition, newAccumulateTweet)
+    val leftAndRightFiltered = right.filterAcc(satisfiesCondition, leftFiltered)
     leftAndRightFiltered
   }
 
   def union(that: TweetSet): TweetSet = {
-    val newAccumulateTweet = that.incl(currentTweet)
-    val leftUnion =  leftElem.union(newAccumulateTweet)
-    val leftAndRightUnion = rightElem.union(leftUnion)
+    val newAccumulateTweet = that.incl(elem)
+    val leftUnion =  left.union(newAccumulateTweet)
+    val leftAndRightUnion = right.union(leftUnion)
     leftAndRightUnion
   } 
 
   def mostRetweeted: Tweet = {
     val leftMostRetweeted = { 
-      leftElem match {
-        case _: Empty    => currentTweet 
-        case _: NonEmpty => leftElem.mostRetweeted
+      left match {
+        case _: Empty    => elem 
+        case _: NonEmpty => left.mostRetweeted
       }
     }
     val rightMostRetweeted = { 
-      rightElem match {
-        case _: Empty    => currentTweet 
-        case _: NonEmpty => rightElem.mostRetweeted
+      right match {
+        case _: Empty    => elem
+        case _: NonEmpty => right.mostRetweeted
       }
     }
-    calMaximum(currentTweet, leftMostRetweeted, rightMostRetweeted)
-
-    def calMaximum(a: Tweet, b: Tweet, c: Tweet): Tweet = {
-      if (a.retweets > b.retweets && a.retweets > c.retweets) a
-      else if (b.retweets > c.retweets) b
-      else c
-    }
+    if (elem.retweets > leftMostRetweeted.retweets && elem.retweets > rightMostRetweeted.retweets) elem
+    else if (leftMostRetweeted.retweets > rightMostRetweeted.retweets) leftMostRetweeted
+    else rightMostRetweeted
   }
   
   def descendingByRetweet: TweetList = new Cons (mostRetweeted, remove(mostRetweeted).descendingByRetweet)
@@ -227,8 +224,8 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  lazy val googleTweets: TweetSet = TweetReader.allTweets.filter(tweet: Tweet => google.exists(keyword: String => tweet.text.contains(keyword)))
-  lazy val appleTweets: TweetSet = TweetReader.allTweets.filter(tweet: Tweet => apple.exists(keyword: String => tweet.text.contains(keyword)))
+  lazy val googleTweets: TweetSet = TweetReader.allTweets.filter(tweet => google.exists(keyword => tweet.text.contains(keyword)))
+  lazy val appleTweets: TweetSet = TweetReader.allTweets.filter(tweet => apple.exists(keyword => tweet.text.contains(keyword)))
 
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
