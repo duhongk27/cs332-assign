@@ -272,8 +272,8 @@ object Huffman {
     println("decoded result: "+decode(ttree, te).mkString)
   }
 
-  def main(args: Array[String]): Unit = {
+  /*def main(args: Array[String]): Unit = {
     val text = "duhongwiwiwihello"
     EncodeAndDecodeTest(text)
-  }
+  }*/
 }
