@@ -241,7 +241,7 @@ object Huffman {
   def convert(tree: CodeTree): CodeTable = {
     def traverseTree(subtree: CodeTree, path: List[Bit]): CodeTable = subtree match {
       case Leaf(char, _) => List((char, path))
-      case Fork(left, right, _, _) => mergeCodeTables(traverseTree(left, path :+ 1), traverseTree(right, path :+ 0))
+      case Fork(left, right, _, _) => mergeCodeTables(traverseTree(left, path :+ LEFT_T), traverseTree(right, path :+ RIGHT_T))
       case _ => throw new Error("convert error")
     }
     traverseTree(tree, List())
@@ -272,8 +272,18 @@ object Huffman {
     println("decoded result: "+decode(ttree, te).mkString)
   }
 
-  /*def main(args: Array[String]): Unit = {
-    val text = "duhongwiwiwihello"
-    EncodeAndDecodeTest(text)
-  }*/
+  def QuickEncodeAndDecodeTest(text: String): Unit = {
+    val tlist = text.toList
+    val ttree = createCodeTree(tlist)
+    val te = quickEncode(ttree)(tlist)
+    assert(text == decode(ttree, te).mkString)
+    println("encoded result: "+te.mkString)
+    println("decoded result: "+decode(ttree, te).mkString)
+  }
+
+  //def main(args: Array[String]): Unit = {
+  //  val text = "duhongwiwiwihello"
+  //  EncodeAndDecodeTest(text)
+  //  QuickEncodeAndDecodeTest(text)
+  //}
 }
