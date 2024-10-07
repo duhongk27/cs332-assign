@@ -204,7 +204,10 @@ object Huffman {
    */
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
     def encodeChar(subtree: CodeTree, char: Char): List[Bit] = subtree match {
-      case Leaf(c, _) if c == char => List()
+      case Leaf(c, _) => {
+        if (c == char) List()
+        else throw new Error("cannot found char")
+      }
       case Fork(left, right, _, _) => {
         if (chars(left).contains(char)) LEFT_T :: encodeChar(left, char)
         else RIGHT_T :: encodeChar(right, char)
@@ -226,7 +229,7 @@ object Huffman {
   def codeBits(table: CodeTable)(char: Char): List[Bit] = {
     table.find(_._1 == char) match {
       case Some((_, bits)) => bits
-      case None => throw new Error("cannot found character in CodeTable")
+      case None => throw new Error("cannot found proper character in CodeTable")
     }
   }
 
@@ -260,8 +263,12 @@ object Huffman {
    * To speed up the encoding process, it first converts the code tree to a code table
    * and then uses it to perform the actual encoding.
    */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] =
-    text.flatMap(char => codeBits(convert(tree))(char))
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    val codeTable = convert(tree)
+    text.foldLeft(List[Bit]()) { (accum, char) =>
+      accum ++ codeBits(codeTable)(char)
+    }
+  }
 
   def EncodeAndDecodeTest(text: String): Unit = {
     val tlist = text.toList
@@ -281,7 +288,7 @@ object Huffman {
     println("decoded result: "+decode(ttree, te).mkString)
   }
 
-  //def main(args: Array[String]): Unit = {
+  // def main(args: Array[String]): Unit = {
   //  val text = "duhongwiwiwihello"
   //  EncodeAndDecodeTest(text)
   //  QuickEncodeAndDecodeTest(text)
