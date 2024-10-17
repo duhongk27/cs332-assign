@@ -31,12 +31,12 @@ trait GameDef {
    *  
    *   x axis
    */
-  case class Pos(row: Int, col: Int) {
+  case class Pos(x: Int, y: Int) {
     /** The position obtained by changing the `x` coordinate by `d` */
-    def dx(d: Int) = copy(row = row + d)
+    def dx(d: Int) = copy(x = x + d)
 
     /** The position obtained by changing the `y` coordinate by `d` */
-    def dy(d: Int) = copy(col = col + d)
+    def dy(d: Int) = copy(y = y + d)
   }
 
   /**
@@ -94,7 +94,7 @@ trait GameDef {
   case class Block(b1: Pos, b2: Pos) {
 
     // checks the requirement mentioned above
-    require(b1.row <= b2.row && b1.col <= b2.col, "Invalid block position: b1=" + b1 + ", b2=" + b2)
+    require(b1.x <= b2.x && b1.y <= b2.y, "Invalid block position: b1=" + b1 + ", b2=" + b2)
 
     /**
      * Returns a block where the `x` coordinates of `b1` and `b2` are
