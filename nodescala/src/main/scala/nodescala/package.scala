@@ -66,8 +66,8 @@ package object nodescala {
       Future {
         blocking {
           Thread.sleep(t.toMillis)
+          promise.success(())
         }
-        promise.complete(Try(()))
       }
       promise.future
     }
@@ -95,12 +95,12 @@ package object nodescala {
   implicit class FutureOps[T](val f: Future[T]) extends AnyVal {
 
     /** Returns the result of this future if it is completed now.
-     *  Otherwise, throws a `NoSuchElementException`.
+     * Otherwise, throws a `NoSuchElementException`.
      *
-     *  Note: This method does not wait for the result.
-     *  It is thus non-blocking.
-     *  However, it is also non-deterministic -- it may throw or return a value
-     *  depending on the current state of the `Future`.
+     * Note: This method does not wait for the result.
+     * It is thus non-blocking.
+     * However, it is also non-deterministic -- it may throw or return a value
+     * depending on the current state of the `Future`.
      */
     def now: T = {
       f.value match {
@@ -111,21 +111,24 @@ package object nodescala {
     }
 
     /** Continues the computation of this future by taking the current future
-     *  and mapping it into another future.
+     * and mapping it into another future.
      *
-     *  The function `cont` is called only after the current future completes.
-     *  The resulting future contains a value returned by `cont`.
+     * The function `cont` is called only after the current future completes.
+     * The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = f.map { _ => cont(f)}
+    def continueWith[S](cont: Future[T] => S): Future[S] = f.map { _ => cont(f) }
 
     /** Continues the computation of this future by taking the result
-     *  of the current future and mapping it into another future.
+     * of the current future and mapping it into another future.
      *
-     *  The function `cont` is called only after the current future completes.
-     *  The resulting future contains a value returned by `cont`.
+     * The function `cont` is called only after the current future completes.
+     * The resulting future contains a value returned by `cont`.
      */
-    def continue[S](cont: Try[T] => S): Future[S] = f.map { case result => cont(result)
-
+    def continue[S](cont: Try[T] => S): Future[S] = {
+      val p = Promise[S]()
+      f onComplete { result => p.complete(Try(cont(result))) }
+      p.future
+    }
   }
 
   /** Subscription objects are used to be able to unsubscribe

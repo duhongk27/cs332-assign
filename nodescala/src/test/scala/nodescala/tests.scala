@@ -22,7 +22,6 @@ class NodeScalaSuite extends FunSuite {
   }
   test("A Future should never be completed") {
     val never = Future.never[Int]
-
     try {
       Await.result(never, 1 second)
       assert(false)
@@ -96,7 +95,6 @@ class NodeScalaSuite extends FunSuite {
     val dummySubscription = dummy.start("/testDir") {
       request => for (kv <- request.iterator) yield (kv + "\n").toString
     }
-
     // wait until server is really installed
     Thread.sleep(500)
 
@@ -106,7 +104,6 @@ class NodeScalaSuite extends FunSuite {
       val expected = (for (kv <- req.iterator) yield (kv + "\n").toString).mkString
       assert(content == expected, s"'$content' vs. '$expected'")
     }
-
     test(immutable.Map("StrangeRequest" -> List("Does it work?")))
     test(immutable.Map("StrangeRequest" -> List("It works!")))
     test(immutable.Map("WorksForThree" -> List("Always works. Trust me.")))
